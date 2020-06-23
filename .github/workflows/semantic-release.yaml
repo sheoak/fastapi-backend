@@ -25,7 +25,7 @@ jobs:
           flake8 .
       - name: Test with django
         run: |
-          pytest -m "not local" app
+          pytest -m "not local"
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
