@@ -17,6 +17,13 @@ def validate_password(password: str):
     for example when using a mobile phone. For that reason the password
     need to match the folowing rules:
     """
+
+    if not config.USERS_PASSWORDLESS_REGISTRATION and not password:
+        raise ValueError("password cannot be empty")
+
+    if config.USERS_PASSWORDLESS_REGISTRATION and not password:
+        return password
+
     if len(password) < config.MIN_PASSWORD_LENGTH:
         raise ValueError("password is too short")
 
@@ -50,16 +57,16 @@ class UserBaseInDB(UserBase):
 # Properties to receive via API on creation
 class UserCreate(UserBaseInDB):
     email: EmailStr
-    password: str
+    password: Optional[str]
 
-    _normalize_password = validator('password', allow_reuse=True)(validate_password)
+    _normalize_password = validator('password', allow_reuse=True, always=True)(validate_password)
 
 
 # Properties to receive via API on update
 class UserUpdate(UserBaseInDB):
     password: Optional[str] = None
 
-    _normalize_password = validator('password', allow_reuse=True)(validate_password)
+    _normalize_password = validator('password', allow_reuse=True, always=True)(validate_password)
 
 
 # Additional properties to return via API
