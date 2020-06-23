@@ -1,0 +1,14 @@
+-   model: api.story
+    pk: 1
+    fields:
+        created: 2020-03-28 09:30:37.248442+00:00
+        title: Un essai
+        text: toto
+        owner: 1
+-   model: api.story
+    pk: 2
+    fields:
+        created: 2020-03-28 09:30:44.786950+00:00
+        title: Un autre essai
+        text: toto
+        owner: 1

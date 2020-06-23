@@ -1,0 +1,61 @@
+{
+  "name": "fastapi-backend",
+  "version": "0.0.0-development",
+  "private": true,
+  "scripts": {
+    "semantic-release": "semantic-release"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "git-precommit-checks": "^3.0.2",
+    "husky": "^4.2.3",
+    "precise-commits": "^1.0.2",
+    "semantic-release": "^17.0.4"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "type-enum": [
+        2,
+        "always",
+        [
+          "build",
+          "ci",
+          "chore",
+          "docs",
+          "wip",
+          "feat",
+          "fix",
+          "perf",
+          "refactor",
+          "revert",
+          "style",
+          "test"
+        ]
+      ],
+      "subject-case": [
+        2,
+        "always",
+        "sentence-case"
+      ]
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "flake8 & pytest -m unitary",
+      "pre-push": "pytest",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sheoak/fastapi-backend.git"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

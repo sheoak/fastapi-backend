@@ -1,0 +1,6 @@
+[flake8]
+filename = *.py
+#ignore = E226,E302,E41
+exclude = node_modules/*, staticfiles/*, static/*, alembic/versions/*, tmp/*
+max-line-length = 127
+max-complexity = 8

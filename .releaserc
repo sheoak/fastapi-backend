@@ -1,0 +1,15 @@
+{
+    "repositoryUrl": "https://github.com/sheoak/fastapi-backend.git",
+    "npmPublish": false,
+    "debug": true,
+    "plugins": [
+        ["@semantic-release/commit-analyzer", {
+          "preset": "angular",
+          "releaseRules": [
+            {"type": "refactor", "release": "patch"},
+            {"type": "revert", "release": "patch"}
+          ]
+        }],
+        "@semantic-release/release-notes-generator"
+      ]
+}

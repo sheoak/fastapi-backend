@@ -1,0 +1,9 @@
+[run]
+source = .
+omit =
+    */node_modules/*
+    */site-packages/*
+    */api/migrations/*
+    manage.py
+    app.py
+

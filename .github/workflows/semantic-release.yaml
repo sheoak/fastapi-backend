@@ -1,0 +1,32 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Python setup
+        uses: actions/setup-python@v1
+      - name: Install missing packages
+        run: sudo apt-get install libpq-dev
+      - name: install
+        run: npm install
+      - name: pip
+        run: pip install -r requirements.txt
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          # zero tolerance policy with flake8
+          flake8 .
+      - name: Test with django
+        run: |
+          pytest app
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx semantic-release
