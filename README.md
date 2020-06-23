@@ -2,6 +2,11 @@
 
 An API Backend using [Fastapi][1].
 
+
+*WORK IN PROGRESS*
+*DO NOT USE!*
+
+
 This backend was initially started as a fork of [full-stack-fastapi-postgresql][3].
 Due to too many modifications it's now detached from the initial project.
 
