@@ -41,6 +41,7 @@ def test_update_password(
     assert user.email == base_user["email"]
 
 
+@pytest.mark.local
 @pytest.mark.usefixtures('enable_pwned_password')
 @pytest.mark.parametrize("password", samples.corrupted_passwords)
 def test_create_user_pwned_password(
