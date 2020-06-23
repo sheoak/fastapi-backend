@@ -58,6 +58,7 @@ def test_check_if_user_is_active(normal_users: Dict):
     assert user.is_active
 
 
+@pytest.mark.local
 @pytest.mark.usefixtures("db")
 def test_check_if_user_is_inactive(inactive_users: Dict):
     user = UserModel.get(email=inactive_users[0]["email"])
