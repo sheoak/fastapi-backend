@@ -110,6 +110,7 @@ Scenario: Register with an invalid password
     And The response should only contain the error
     And The response should not contain my password
 
+@local
 Scenario: Register with a corrupted password
     Given I have a corrupted password
     And The server accepts open registration
@@ -120,6 +121,7 @@ Scenario: Register with a corrupted password
     And The response should only contain the error
     And The response should not contain my password
 
+@local
 Scenario: Register with a non-corrupted password
     Given I have a non-corrupted password
     And The server accepts open registration
