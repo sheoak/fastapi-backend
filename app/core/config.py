@@ -1,4 +1,4 @@
-import os
+import secrets
 
 from envparse import env
 from dotenv import load_dotenv
@@ -50,7 +50,7 @@ FASTAPI_ENV = env.str("FASTAPI_ENV", default="development")
 
 # security
 MIN_PASSWORD_LENGTH = env.int("MIN_PASSWORD_LENGTH", default=8)
-SECRET_KEY = env.str("SECRET_KEY", default=os.urandom(32))
+SECRET_KEY = env.str("SECRET_KEY", default=secrets.token_urlsafe(32))
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days = 8 days
 PASSWORD_DB_PATH = env.str("PASSWORD_DB_PASS", default='data/pwned-passwords-v5.bin')
 PASSWORD_PWNED_CHECK = env.bool("PASSWORD_PWNED_CHECK", default=True)
