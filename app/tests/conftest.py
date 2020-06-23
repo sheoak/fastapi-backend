@@ -207,6 +207,18 @@ def enable_open_registration() -> None:
     yield from tweak_config('USERS_OPEN_REGISTRATION', True)
 
 
+@given("The server accepts passwordless registration")
+def enable_passwordless_registration() -> None:
+    """Enable open registration configuation"""
+    yield from tweak_config('USERS_PASSWORDLESS_REGISTRATION', True)
+
+
+@given("The server refuses passwordless registration")
+def disable_passwordless_registration() -> None:
+    """Enable open registration configuation"""
+    yield from tweak_config('USERS_PASSWORDLESS_REGISTRATION', False)
+
+
 @given("The server refuses open registration")
 def disable_open_registration() -> None:
     """Disable open registration configuation"""
@@ -293,6 +305,12 @@ def base_user() -> Dict[str, str]:
         "email": "anewemail@domain.com",
         "password": "avalidpassword_99!"
     }
+
+
+@given("I don't have a password", target_fixture="user")
+def base_user_passwordless(user: Dict[str, str]) -> Dict[str, str]:
+    del user['password']
+    return user
 
 
 @given("I have a non existing user", target_fixture="user")

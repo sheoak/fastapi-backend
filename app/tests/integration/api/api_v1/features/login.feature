@@ -73,6 +73,25 @@ Scenario: Open registration with a valid account
     And I should not be admin
     And The response should not contain my password
 
+Scenario: Open passwordless registration with a valid account
+    Given I'm a new user
+    And I don't have a password
+    And The server accepts open registration
+    And The server accepts passwordless registration
+    When I create an account
+    Then I should get a '200' response
+    And The following user fields should match: "email"
+    And I should not be admin
+
+Scenario: Forbidden passwordless registration with a valid account
+    Given I'm a new user
+    And I don't have a password
+    And The server accepts open registration
+    And The server refuses passwordless registration
+    When I create an account
+    Then I should get a '422' response
+    And The response should only contain the error
+
 Scenario: Forbidden access to account creation on the admin endpoint
     Given I'm an active user
     And I have a valid token
