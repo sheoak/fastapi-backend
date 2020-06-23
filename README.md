@@ -83,6 +83,7 @@ app/tests/data/.
 #### Run pdb
 
 Add a trace in a test and run pdb
+
     …
     pytest.set_trace()
     …
