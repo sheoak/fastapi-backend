@@ -101,7 +101,7 @@ class User(BaseModel):
     def verify_password(self, password: str) -> bool:
         """Check that the password match the user password
         Example:
-            if user.verify_password(wrong_password):
+            if not user.verify_password(wrong_password):
                 print('Wrong password')
         """
         return pwd_context.verify(password, self.hashed_password)
