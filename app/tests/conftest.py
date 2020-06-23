@@ -247,9 +247,9 @@ def users(sample_data: Dict) -> Dict:
 
 
 @given("I have sample active users", scope="session")
-def active_users(sample_data: Dict) -> Dict:
+def active_users(users: Dict) -> Dict:
     """"Return only active users"""
-    return [user for user in sample_data.users if user["is_active"]]
+    return [user for user in users if user["is_active"]]
 
 
 @given("I have sample normal users", scope="session")
@@ -265,9 +265,9 @@ def super_users(active_users: Dict) -> Dict:
 
 
 @given("I have sample inactive users", scope="session")
-def inactive_users(sample_data: Dict) -> Dict:
+def inactive_users(users: Dict) -> Dict:
     """"Return only inactive users"""
-    return [user for user in sample_data.users if not user["is_active"]]
+    return [user for user in users if not user["is_active"]]
 
 
 @given("I have sample users with hashed passwords", scope="session")
