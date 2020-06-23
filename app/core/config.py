@@ -36,12 +36,11 @@ EMAIL_RESET_TOKEN_EXPIRE_HOURS = 48
 EMAIL_TEMPLATES_DIR = "app/email-templates/build"
 EMAILS_ENABLED = SMTP_HOST and SMTP_PORT and EMAILS_FROM_EMAIL
 
-FIRST_SUPERUSER = env.str("FIRST_SUPERUSER", default="admin")
+FIRST_SUPERUSER = env.str("FIRST_SUPERUSER")
 FIRST_SUPERUSER_PASSWORD = env.str("FIRST_SUPERUSER_PASSWORD")
 
 USERS_OPEN_REGISTRATION = env.bool("USERS_OPEN_REGISTRATION", default=False)
 USERS_PASSWORDLESS_REGISTRATION = env.bool("USERS_PASSWORDLESS_REGISTRATION", default=True)
-
 
 EMAIL_TEST_USER = env.str("EMAIL_TEST_USER", default="test2@fastapi.test")
 PASS_TEST_USER = env.str("PASS_TEST_USER", default="test")
@@ -55,3 +54,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days = 8 
 PASSWORD_DB_PATH = env.str("PASSWORD_DB_PASS", default='data/pwned-passwords-v5.bin')
 PASSWORD_PWNED_CHECK = env.bool("PASSWORD_PWNED_CHECK", default=True)
 PASSWORD_ALLOW_SPECIAL = env.bool("PASSWORD_ALLOW_SPECIAL", default=True)
+
+RANDOM_WORD_FILE = 'data/dict/four-chars.fr.txt'
+

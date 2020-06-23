@@ -3,7 +3,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import status
 
 from app.api.utils.security import get_current_user, create_token
-# TODO: rename as User, and pydantic becomes UserSchema
 from app.models.user import User as UserModel
 from app.schemas.user import UserUpdate
 from app.schemas.msg import Msg
@@ -12,6 +11,7 @@ from app.schemas.user import User
 from app.utils import (
     generate_password_reset_token,
     send_reset_password_email,
+    send_generate_password_email,
     verify_password_reset_token,
 )
 
@@ -27,15 +27,28 @@ def login_access_token(
         email=form_data.username,
         password=form_data.password
     )
+    # we do not send information about disabled users to avoid informations leaks
     if not user or not user.is_active:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password")
-    # this leak information
-    # elif not user.is_active:
-    #     raise HTTPException(status_code=400, detail="Inactive user")
     return {
         "access_token": create_token(user.id),
         "token_type": "bearer",
     }
+
+
+# TODO: handle errors
+# TODO: send email
+@router.post("/login/generate-password/{email}", tags=["login"], response_model=Msg)
+def generate_password(email: str):
+    """Generate a temporary password and send it by email"""
+    password = UserModel.generate_password(email=email)
+
+    if password:
+        send_generate_password_email(
+            email_to=email, email=email, password=password
+        )
+
+    return {"msg": "If this email is valid you will receive a magic link by email shortly."}
 
 
 @router.post("/login/test-token", tags=["login"], response_model=User)
@@ -50,16 +63,12 @@ def recover_password(email: str):
     user = UserModel.get(email=email)
 
     if user:
-        # TODO: config to leak infomation/debug?
-        # raise HTTPException(
-        #     status_code=404,
-        #     detail="The user with this username does not exist in the system.",
-        # )
         password_reset_token = generate_password_reset_token(email=email)
         send_reset_password_email(
             email_to=user.email, email=email, token=password_reset_token
         )
 
+    # we do not leak informations about existing users
     return {"msg": "If this email is valid, you will receive an email with your recovery link shortly."}
 
 
@@ -67,19 +76,16 @@ def recover_password(email: str):
 def reset_password(token: str = Body(...), new_password: str = Body(...)):
     """Reset password"""
 
-    # TODO: move to model method? UserModel.verify_reset_token(t)
     email = verify_password_reset_token(token)
     if not email:
         raise HTTPException(status_code=400, detail="Invalid token")
 
     user = UserModel.get(email=email)
-    if not user:
+    if not user or not user.is_active:
         raise HTTPException(
             status_code=404,
             detail="The user with this username does not exist in the system.",
         )
-    elif not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
 
     user_in = UserUpdate(password=new_password)
     user.update(user_in)

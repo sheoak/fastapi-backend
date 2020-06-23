@@ -3,25 +3,19 @@ Generic User model
 """
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 from typing import Optional
 
-# import jwt
-# from jwt import PyJWTError
-# from app.core.jwt import ALGORITHM
-# from app.core.jwt import create_access_token
-# from app.schemas.token import TokenPayload
-
 from passlib.context import CryptContext
-# from fastapi import Security
-# from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String, Date
 
 from app.db.base_class import BaseModel, ModelExistError
 from app.schemas.user import UserCreate, UserUpdate, UserBaseInDB
 
+from app.utils import random_n_words
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-# reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/v1/login/access-token")
 
 
 class User(BaseModel):
@@ -31,8 +25,11 @@ class User(BaseModel):
     full_name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    login_retry = Column(Integer)
     is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
+    password_set = Column(Boolean(), default=False)
+    password_expire = Column(Date(), default=None)
     # items = relationship("Item", back_populates="owner")
 
     @classmethod
@@ -41,6 +38,9 @@ class User(BaseModel):
             hash = pwd_context.hash(data["password"])
             del data["password"]
             data["hashed_password"] = hash
+            data["password_set"] = True
+            data["password_expire"] = None
+            data["login_retry"] = 0
         return data
 
     @classmethod
@@ -72,23 +72,27 @@ class User(BaseModel):
         # database to avoid leaking informations in logs
         user = cls.get(email=email)
         if user and user.verify_password(password):
+            user.login_retry = 0
             return user
         return None
 
-    # TODO: finish this, find a way to load the configuration
-    # in a generic way
-    # def get_from_token(
-    #     self,
-    #     token: str = Security(reusable_oauth2),
-    # ):
-    #     # TODO: user model
-    #     try:
-    #         payload = jwt.decode(token, config.SECRET_KEY, algorithms=[ALGORITHM])
-    #         token_data = TokenPayload(**payload)
-    #     except PyJWTError:
-    #         return None
+    # TODO: handle errors
+    # TODO: move duration to configuration
+    @classmethod
+    def generate_password(cls, email: str) -> str:
+        user = cls.get(email=email)
 
-    #     return self.find_or_fail(token_data.user_id)
+        if not user:
+            return False
+
+        if user.password_set:
+            return False
+
+        user.login_retry = 0
+        user.password_expire = datetime.now() + timedelta(hours=1)
+        password = random_n_words()
+        user.hashed_password = pwd_context.hash(password)
+        return password
 
     def update(self, user: UserUpdate) -> User:
         """Update the user with given data
@@ -104,4 +108,13 @@ class User(BaseModel):
             if not user.verify_password(wrong_password):
                 print('Wrong password')
         """
+        # password was never defined or generated
+        if not self.hashed_password:
+            return False
+
+        # password expired
+        # TODO: handle errors
+        if self.password_expire and self.password_expire < datetime.now():
+            return False
+
         return pwd_context.verify(password, self.hashed_password)

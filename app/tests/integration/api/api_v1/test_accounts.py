@@ -11,6 +11,7 @@ from typing import Dict, Callable
 from requests.models import Response
 from pytest_bdd import scenarios, given, when, then, parsers
 
+from app.models.user import User as UserModel
 from app.utils import generate_password_reset_token
 
 
@@ -32,8 +33,16 @@ def recovery_token(
 ) -> str:
     """Return a valid auth token"""
     token = generate_password_reset_token(email=user["email"])
-    return token.decode()
+    return token
 
+
+@given("I have a temporary password", target_fixture="user")
+def password_generated(
+    user: Dict
+) -> str:
+    """Return a valid auth token"""
+    user['password'] = UserModel.generate_password(user['email'])
+    return user
 
 # -----------------------------------------------------------------------------
 # WHEN
@@ -54,6 +63,15 @@ def request_token(
     context.data = user
     context.response = post("/login/access-token", data=credentials)
 
+@when('I request a temporary password')
+def request_temporary_password(
+    post: Callable,
+    context: Dict,
+    user: Dict[str, str],
+) -> Dict[str, str]:
+    """Requesting a temporary password"""
+    context.data = user
+    context.response = post(f"/login/generate-password/{user['email']}")
 
 @when("I request a token with invalid data")
 def request_token_invalid(
@@ -285,6 +303,15 @@ def check_response_status(
         "Response status code is missing"
     assert response.status_code == code, \
         f"Expected status code {code} but got {response.status_code}"
+
+
+@then("I should receive an email")
+def check_get_email(
+    smtp_server
+) -> None:
+    pass
+    # assert(smtp_server.received_message_matching("From: .*\\nTo: .*\\n+.+tent"))
+
 
 
 @then("I should be admin")
