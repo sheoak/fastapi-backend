@@ -1,6 +1,7 @@
 from app.core import config
 from app.schemas.user import UserCreate
 from app.models.user import User as UserModel
+from app.db.session import SessionScope
 
 # make sure all SQL Alchemy models are imported before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly
@@ -24,3 +25,4 @@ def init_db():
             is_superuser=True,
         )
         user = UserModel.create(user_in)
+        # SessionScope().commit()

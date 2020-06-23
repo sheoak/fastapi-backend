@@ -85,6 +85,7 @@ def delete_user_me(
     return
 
 
+# TODO: send an email
 @router.post("/open", response_model=User)
 def create_user_open(
     *,
@@ -106,7 +107,6 @@ def create_user_open(
     return user
 
 
-# why a different way to do for get? other endpoints need superuser
 @router.get("/{user_id}", response_model=User)
 def read_user_by_id(
     *,

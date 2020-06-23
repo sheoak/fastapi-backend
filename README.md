@@ -107,6 +107,11 @@ Please request coding guide before starting
 [5]: https://github.com/absent1706/sqlalchemy-mixins
 
 
+### Add an automatic alembic migration
+
+    alembic revision --autogenerate -m "migration message"
+    alembic upgrade head
+
 ## License
 
 This project is licensed under the terms of the MIT license.

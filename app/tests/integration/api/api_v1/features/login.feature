@@ -7,6 +7,7 @@ Feature: Login
 Background:
     Given Some users are in the system
     And The server is set to not check corrupted passwords
+    And I have a smtp server running
 
 
 # ----------------------------------------------------------------------------
@@ -37,6 +38,21 @@ Scenario: Verifying an admin token
 
 Scenario: Login as a user
     Given I'm an active user
+    When I request a token
+    Then I should get a '200' response
+    And The response should contain the following non-empty fields: "access_token, token_type"
+
+# TODO: verify the response does not contain the password
+# TODO: verify email is sent
+Scenario: Get a temporary password
+    Given I'm an active user
+    When I request a temporary password
+    Then I should get a '200' response
+    And I should receive an email
+
+Scenario: Login as a user with temporary password
+    Given I'm an active user
+    And I have a temporary password
     When I request a token
     Then I should get a '200' response
     And The response should contain the following non-empty fields: "access_token, token_type"
@@ -72,6 +88,7 @@ Scenario: Open registration with a valid account
     And The following user fields should match: "email"
     And I should not be admin
     And The response should not contain my password
+    And I should receive an email
 
 Scenario: Open passwordless registration with a valid account
     Given I'm a new user
@@ -82,6 +99,7 @@ Scenario: Open passwordless registration with a valid account
     Then I should get a '200' response
     And The following user fields should match: "email"
     And I should not be admin
+    And I should receive an email
 
 Scenario: Forbidden passwordless registration with a valid account
     Given I'm a new user
@@ -314,6 +332,7 @@ Scenario: Password recovery
     When I request a new password
     Then I should get a '200' response
     And The response should contain the following non-empty fields: "msg"
+    And I should receive an email
     # TODO: check the email, using a mock?
 
 Scenario: Password reset
@@ -322,6 +341,7 @@ Scenario: Password reset
     When I visit the recovery link with my token
     Then I should get a '200' response
     And The response field "msg" should be "Password updated successfully"
+    And I should receive an email
 
 Scenario: Password recovery does not leak information
     Given: I'm a new user

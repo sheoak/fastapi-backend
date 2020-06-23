@@ -129,3 +129,4 @@ wimpy==0.6
 wmctrl==0.3
 wrapt==1.12.1
 zope.interface==5.1.0
+python-jose==3.1.0
