@@ -24,7 +24,7 @@ jobs:
           flake8 .
       - name: Test with pytest
         run: |
-          pytest app
+          pytest -m "not local" app
           # env:
           # DEBUG: True
           # DATABASE_URL: sqlite:///db.sqlite
