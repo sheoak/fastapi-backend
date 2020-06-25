@@ -1,3 +1,7 @@
+"""Misc. utils
+
+TODO: refactor mail sending helpers
+"""
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -95,10 +99,21 @@ def send_reset_password_email(email_to: str, email: str, token: str) -> None:
     )
 
 
-def send_new_account_email(email_to: str, username: str, password: str) -> None:
+def send_new_account_email(
+    email_to: str,
+    username: str,
+    password: str = None,
+    open_registration: bool = False
+) -> None:
+
+    if open_registration:
+        template = 'new_account_open.html'
+    else:
+        template = 'new_account.html'
+
     project_name = config.PROJECT_NAME
     subject = f"{project_name} - New account for user {username}"
-    with open(Path(config.EMAIL_TEMPLATES_DIR) / "new_account.html") as f:
+    with open(Path(config.EMAIL_TEMPLATES_DIR) / template) as f:
         template_str = f.read()
     link = config.SERVER_HOST
     send_email(

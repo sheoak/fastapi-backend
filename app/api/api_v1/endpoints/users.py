@@ -55,6 +55,34 @@ def create_user(
     return user
 
 
+@router.post("/open", response_model=User)
+def create_user_open(
+    *,
+    user_in: UserCreate,
+):
+    """Create new user without the need to be logged in."""
+    if not config.USERS_OPEN_REGISTRATION:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Open user registration is forbidden on this server",
+        )
+    try:
+        user = UserModel.create(user_in)
+    except ModelExistError:
+        raise HTTPException(
+            status_code=400,
+            detail="The user with this username already exists in the system.",
+        )
+
+    if config.EMAILS_ENABLED and user_in.email:
+        send_new_account_email(
+            email_to=user_in.email,
+            username=user_in.email,
+            open_registration=True
+        )
+    return user
+
+
 @router.put("/me", response_model=User)
 def update_user_me(
     *,
@@ -83,28 +111,6 @@ def delete_user_me(
 ):
     current_user.delete()
     return
-
-
-# TODO: send an email
-@router.post("/open", response_model=User)
-def create_user_open(
-    *,
-    user_in: UserCreate,
-):
-    """Create new user without the need to be logged in."""
-    if not config.USERS_OPEN_REGISTRATION:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Open user registration is forbidden on this server",
-        )
-    try:
-        user = UserModel.create(user_in)
-    except ModelExistError:
-        raise HTTPException(
-            status_code=400,
-            detail="The user with this username already exists in the system.",
-        )
-    return user
 
 
 @router.get("/{user_id}", response_model=User)
