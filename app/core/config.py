@@ -56,4 +56,3 @@ PASSWORD_PWNED_CHECK = env.bool("PASSWORD_PWNED_CHECK", default=True)
 PASSWORD_ALLOW_SPECIAL = env.bool("PASSWORD_ALLOW_SPECIAL", default=True)
 
 RANDOM_WORD_FILE = 'data/dict/four-chars.fr.txt'
-

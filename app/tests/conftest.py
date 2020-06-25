@@ -16,7 +16,7 @@ import os
 import random
 import string
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Dict, Generator
 
 import pytest  # noqa
