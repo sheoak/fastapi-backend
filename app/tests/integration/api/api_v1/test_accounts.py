@@ -35,6 +35,7 @@ def recovery_token(
     token = generate_password_reset_token(email=user["email"])
     return token
 
+
 @given("I have a recovery token with an invalid email", target_fixture="recovery_token")
 def recovery_token_invalid_email(
 ) -> str:
@@ -42,11 +43,13 @@ def recovery_token_invalid_email(
     token = generate_password_reset_token(email="invalidemail@fastapi.test")
     return token
 
+
 @given("I have an invalid recovery token", target_fixture="recovery_token")
 def recovery_invalid_token(
 ) -> str:
     """Return a valid auth token"""
     return 'wrong'
+
 
 @given("I have a temporary password", target_fixture="user")
 def password_generated(
@@ -75,6 +78,7 @@ def request_token(
     context.data = user
     context.response = post("/login/access-token", data=credentials)
 
+
 @when('I request a temporary password')
 def request_temporary_password(
     post: Callable,
@@ -84,6 +88,7 @@ def request_temporary_password(
     """Requesting a temporary password"""
     context.data = user
     context.response = post(f"/login/generate-password/{user['email']}")
+
 
 @when("I request a token with invalid data")
 def request_token_invalid(
@@ -324,8 +329,9 @@ def check_get_email(
     pass
     # assert(smtp_server.received_message_matching("From: .*\\nTo: .*\\n+.+tent"))
 
+
 @then("I should not receive an email")
-def check_get_email(
+def check_get_no_email(
     smtp_server
 ) -> None:
     pass

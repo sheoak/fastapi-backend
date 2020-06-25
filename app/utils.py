@@ -11,7 +11,6 @@ import random
 import emails
 import hashlib
 import pwnedpass
-import jwt
 from emails.template import JinjaTemplate
 from jose import jwt
 
@@ -39,7 +38,6 @@ def send_generate_password_email(email_to: str, email: str, password: str):
             "link": link,
         },
     )
-
 
 
 def send_email(
@@ -160,10 +158,11 @@ def random_word():
     with open(config.RANDOM_WORD_FILE) as f:
         line = next(f)
         for num, aline in enumerate(f, 2):
-            if random.randrange(num): continue
+            if random.randrange(num):
+                continue
             line = aline
         return line.strip()
 
 
 def random_n_words(n=4):
-    return '-'.join(random_word() for i in range(0,n))
+    return '-'.join(random_word() for i in range(0, n))
