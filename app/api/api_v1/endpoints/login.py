@@ -48,7 +48,7 @@ def generate_password(email: str):
             email_to=email, email=email, password=password
         )
 
-    return {"msg": "If this email is valid you will receive a magic link by email shortly."}
+    return {"msg": "If this email is valid you will receive a magic link shortly."}
 
 
 @router.post("/login/test-token", tags=["login"], response_model=User)

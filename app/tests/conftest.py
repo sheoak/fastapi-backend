@@ -13,10 +13,11 @@ TODO: run unitary test with xdist in parrallel
 TODO: try pdbpp
 """
 import os
-import string
 import random
-from typing import Dict, Generator
+import string
 from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Dict, Generator
 
 import pytest  # noqa
 # import smtpmock
@@ -27,16 +28,17 @@ from sqlalchemy.orm.scoping import scoped_session
 import app.tests.data.samples as samples
 from app.api.utils.security import create_token
 from app.core import config
+from app.core.jwt import create_access_token
 from app.db.base_class import Base
 from app.db.session import engine, SessionScope
 from app.main import app
 from app.models.user import User, pwd_context
 from app.tests.utils.utils import tweak_config
 
-import asyncore
-import re
-import smtpd
-import threading
+# import asyncore
+# import re
+# import smtpd
+# import threading
 
 # class MockSMTPServer(smtpd.SMTPServer, threading.Thread):
 #     '''
@@ -199,6 +201,24 @@ def headers_auth(
     user: Dict[str, str],
 ) -> Dict[str, str]:
     token = create_token(user["id"]).decode("utf-8")
+    return {"Authorization": f"Bearer {token}"}
+
+
+@given("I have an expired token", target_fixture="headers", scope="function")
+def headers_auth_expired(
+    user: Dict[str, str],
+) -> Dict[str, str]:
+
+    token = create_access_token(
+        data={"user_id": user["id"]}, expires_delta=timedelta(minutes=-1)
+    ).decode('utf-8')
+    return {"Authorization": f"Bearer {token}"}
+
+
+@given("I have a token with an invalid id", target_fixture="headers", scope="function")
+def headers_auth_invalid_id(
+) -> Dict[str, str]:
+    token = create_token(8888888888).decode("utf-8")
     return {"Authorization": f"Bearer {token}"}
 
 
