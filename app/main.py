@@ -57,6 +57,7 @@ async def db_session_middleware(request: Request, call_next):
     try:
         request.state.db = SessionScope
         response = await call_next(request)
+        request.state.db.commit()
     finally:
         # clean exit in case of error
         request.state.db.close()

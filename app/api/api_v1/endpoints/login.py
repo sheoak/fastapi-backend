@@ -18,7 +18,7 @@ from app.utils import (
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=Token, tags=["login"])
+@router.post("/login/access-token", response_model=Token)
 def login_access_token(
     form_data: OAuth2PasswordRequestForm = Depends()
 ):
@@ -38,7 +38,7 @@ def login_access_token(
 
 # TODO: handle errors
 # TODO: send email
-@router.post("/login/generate-password/{email}", tags=["login"], response_model=Msg)
+@router.post("/login/generate-password/{email}", response_model=Msg)
 def generate_password(email: str):
     """Generate a temporary password and send it by email"""
     password = UserModel.generate_password(email=email)
@@ -51,13 +51,13 @@ def generate_password(email: str):
     return {"msg": "If this email is valid you will receive a magic link shortly."}
 
 
-@router.post("/login/test-token", tags=["login"], response_model=User)
+@router.post("/login/test-token", response_model=User)
 def test_token(current_user: UserModel = Depends(get_current_user)):
     """Test access token"""
     return current_user
 
 
-@router.post("/password-recovery/{email}", tags=["login"], response_model=Msg)
+@router.post("/password-recovery/{email}", response_model=Msg)
 def recover_password(email: str):
     """Password Recovery"""
     user = UserModel.get(email=email)
@@ -72,7 +72,7 @@ def recover_password(email: str):
     return {"msg": "If this email is valid, you will receive an email with your recovery link shortly."}
 
 
-@router.post("/reset-password/", tags=["login"], response_model=Msg)
+@router.post("/reset-password/", response_model=Msg)
 def reset_password(token: str = Body(...), new_password: str = Body(...)):
     """Reset password"""
 

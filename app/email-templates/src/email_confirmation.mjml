@@ -1,0 +1,19 @@
+<mjml>
+  <mj-body background-color="#fff">
+    <mj-section>
+      <mj-column>
+        <mj-divider border-color="#555"></mj-divider>
+        <mj-text font-size="20px" color="#555" font-family="helvetica">{{ project_name }} - Email Update</mj-text>
+        <mj-text font-size="16px" color="#555">We received a request to update the email for your account.
+          with email {{ email }}</mj-text>
+        <mj-text font-size="16px" color="#555">Confirm your new email by clicking the button below:</mj-text>
+        <mj-button padding="50px 0px" href="{{ link }}">Confirm email</mj-button>
+        <mj-text font-size="16px" color="#555">Or open the following link:</mj-text>
+        <mj-text font-size="16px" color="#555"><a href="{{ link }}">{{ link }}</a></mj-text>
+        <mj-divider border-color="#555" border-width="2px" />
+        <mj-text font-size="14px" color="#555">The link will expire in {{ valid_hours }} hours.</mj-text>
+        <mj-text font-size="14px" color="#555">If you didn't request a mail update you can disregard this email.</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from passlib.context import CryptContext
-from sqlalchemy import Boolean, Column, Integer, String, Date
+from sqlalchemy import Boolean, Column, Integer, String, DateTime
+from sqlalchemy.sql import func
 
 from app.db.base_class import BaseModel, ModelExistError
 from app.schemas.user import UserCreate, UserUpdate, UserBaseInDB
@@ -22,15 +23,22 @@ class User(BaseModel):
     __repr_attrs__ = ['id', 'email', 'full_name']
 
     id = Column(Integer, primary_key=True, index=True)
+
+    # user defined
     full_name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    login_retry = Column(Integer)
+
+    # admin only
     is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
+
+    # generated
+    login_retry = Column(Integer)
+    hashed_password = Column(String)
     password_set = Column(Boolean(), default=False)
-    password_expire = Column(Date(), default=None)
-    # items = relationship("Item", back_populates="owner")
+    password_expire = Column(DateTime(timezone=True), default=None)
+    time_creation = Column(DateTime(timezone=True), default=func.now())
+    time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     @classmethod
     def _set_hash(cls, data):
@@ -63,7 +71,7 @@ class User(BaseModel):
 
     @classmethod
     def authenticate(cls, email: str, password: str) -> Optional[User]:
-        """Try to authenticate the given user and return the user in cas of
+        """Try to authenticate the given user and return the user in case of
         success. Note that inactive users can be authenticate.
         Example:
             User.authenticate("mymail@domain.com", "greatpassword")
@@ -73,6 +81,9 @@ class User(BaseModel):
         user = cls.get(email=email)
         if user and user.verify_password(password):
             user.login_retry = 0
+            # temporary code cannot be re-use
+            if not user.password_set:
+                user.hashed_password = None
             return user
         return None
 
@@ -83,10 +94,10 @@ class User(BaseModel):
         user = cls.get(email=email)
 
         if not user:
-            return False
+            return None
 
         if user.password_set:
-            return False
+            return None
 
         user.login_retry = 0
         user.password_expire = datetime.now() + timedelta(hours=1)

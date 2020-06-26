@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, EmailStr, validator
 from typing import Optional
 # import re
@@ -41,21 +43,21 @@ def validate_password(password: str):
 
 # Shared properties
 class UserBase(BaseModel):
-    email: Optional[EmailStr] = None
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     full_name: Optional[str] = None
 
 
 class UserBaseInDB(UserBase):
-    id: int = None
+    id: Optional[int] = None
+    email: Optional[EmailStr] = None
 
     class Config:
         orm_mode = True
 
 
 # Properties to receive via API on creation
-class UserCreate(UserBaseInDB):
+class UserCreate(UserBase):
     email: EmailStr
     password: Optional[str]
 
@@ -63,10 +65,17 @@ class UserCreate(UserBaseInDB):
 
 
 # Properties to receive via API on update
-class UserUpdate(UserBaseInDB):
+# Updating email is forbidden
+# TODO: manage errors if email is given
+class UserUpdate(UserBase):
     password: Optional[str] = None
 
     _normalize_password = validator('password', allow_reuse=True, always=True)(validate_password)
+
+
+# Updating email is allowed
+class UserUpdateFull(UserUpdate):
+    email: Optional[EmailStr] = None
 
 
 # Additional properties to return via API
@@ -77,3 +86,8 @@ class User(UserBaseInDB):
 # Additional properties stored in DB
 class UserInDB(UserBaseInDB):
     hashed_password: str
+    time_creation: datetime
+    time_update: datetime
+    login_retry: int
+    password_set: bool
+    password_expire: datetime

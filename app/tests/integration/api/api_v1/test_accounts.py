@@ -1,8 +1,6 @@
 """Testing account features
 Uses pytest-bdd
 See features/ for the Gerkan definitions
-
-TODO: move to generic config if shared with stories
 """
 import pytest  # noqa
 
@@ -19,6 +17,7 @@ from app.utils import generate_password_reset_token
 # Note that scenarios can be override *before* this line to add more
 # configuration, like parametrize fixtures.
 scenarios("features/login.feature")
+scenarios("features/user.feature")
 
 
 # -----------------------------------------------------------------------------
@@ -295,7 +294,7 @@ def delete_my_account(
     delete: Callable,
     context: Dict,
 ):
-    context.response = delete("/me/")
+    context.response = delete("/me")
 
 # -----------------------------------------------------------------------------
 # THEN

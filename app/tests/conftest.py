@@ -100,6 +100,11 @@ def empty_session() -> Generator:
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
+    # we don't want to commit data during tests
+    def mock_commit():
+        pass
+    SessionScope.commit = mock_commit
+
     yield SessionScope
 
     if (file):
@@ -492,5 +497,3 @@ def check_get_no_email(
     smtp_server
 ) -> None:
     pass
-
-
