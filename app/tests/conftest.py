@@ -22,8 +22,9 @@ from typing import Dict, Generator
 import pytest  # noqa
 # import smtpmock
 from fastapi.testclient import TestClient
-from pytest_bdd import given, parsers
+from pytest_bdd import given, parsers, then
 from sqlalchemy.orm.scoping import scoped_session
+from requests.models import Response
 
 import app.tests.data.samples as samples
 from app.api.utils.security import create_token
@@ -454,3 +455,42 @@ def new_invalid_email(user: Dict[str, str]) -> Dict[str, str]:
     u = user.copy()
     u["email"] = "invalid"
     return u
+
+
+@given("I don't set a page number")
+def page():
+    return None
+
+
+@given(parsers.parse('I set the page to {n:d}'), target_fixture="page")
+def page_n(n):
+    return n
+
+
+@then(parsers.parse("I should get a '{code:d}' response"))
+def check_response_status(
+    response: Response,
+    code: int,
+) -> None:
+    """Ensure that the status code matches"""
+    assert hasattr(response, "status_code"), \
+        "Response status code is missing"
+    assert response.status_code == code, \
+        f"Expected status code {code} but got {response.status_code}"
+
+
+@then("I should receive an email")
+def check_get_email(
+    smtp_server
+) -> None:
+    pass
+    # assert(smtp_server.received_message_matching("From: .*\\nTo: .*\\n+.+tent"))
+
+
+@then("I should not receive an email")
+def check_get_no_email(
+    smtp_server
+) -> None:
+    pass
+
+

@@ -48,6 +48,17 @@ default settings. All secrets should be in the .env file. This follow the
 [12-factor rules][2].
 
 
+### Corrupted password database
+
+If you want to use corrupted password verification, you need to generate a
+binary with the list of "pwned" passwords. Follow instructions on
+
+https://pypi.org/project/pwnedpass/
+
+Move the binary to data/pwned-passwords-v5.bin.
+Do no version this file, as it's around 12G.
+
+
 ## Run
 
     web: uvicorn app.main:app
