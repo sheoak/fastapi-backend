@@ -18,7 +18,7 @@ from app.utils import generate_password_reset_token
 # Loading the scenarios
 # Note that scenarios can be override *before* this line to add more
 # configuration, like parametrize fixtures.
-scenarios("features")
+scenarios("features/login.feature")
 
 
 # -----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ def get_profile(
 ) -> None:
     """Retrieve a profile and store the response"""
     context.data = user
-    context.response = get("/users/me")
+    context.response = get("/me/")
 
 
 @when("I create an account")
@@ -150,6 +150,8 @@ def create_account_admin(
     context.response = post("/users/", json=user)
 
 
+# TODO: modify the data
+# TODO: email modification system
 @when("I update my account")
 def update_account(
     put: Callable,
@@ -158,7 +160,7 @@ def update_account(
 ) -> None:
     """Create an account and store the response"""
     context.data = user
-    context.response = put("/users/me", json=user)
+    context.response = put("/me/", json=user)
 
 
 @when(parsers.parse('I update the account'))
@@ -224,16 +226,6 @@ def pasword_recovery(
     user: Dict[str, str],
 ) -> None:
     context.response = post(f'/password-recovery/{user["email"]}')
-
-
-@given("I don't set a page number")
-def page():
-    return None
-
-
-@given(parsers.parse('I set the page to {n:d}'), target_fixture="page")
-def page_n(n):
-    return n
 
 
 # TODO: test with default limit
@@ -303,38 +295,11 @@ def delete_my_account(
     delete: Callable,
     context: Dict,
 ):
-    context.response = delete("/users/me")
+    context.response = delete("/me/")
 
 # -----------------------------------------------------------------------------
 # THEN
 # -----------------------------------------------------------------------------
-
-
-@then(parsers.parse("I should get a '{code:d}' response"))
-def check_response_status(
-    response: Response,
-    code: int,
-) -> None:
-    """Ensure that the status code matches"""
-    assert hasattr(response, "status_code"), \
-        "Response status code is missing"
-    assert response.status_code == code, \
-        f"Expected status code {code} but got {response.status_code}"
-
-
-@then("I should receive an email")
-def check_get_email(
-    smtp_server
-) -> None:
-    pass
-    # assert(smtp_server.received_message_matching("From: .*\\nTo: .*\\n+.+tent"))
-
-
-@then("I should not receive an email")
-def check_get_no_email(
-    smtp_server
-) -> None:
-    pass
 
 
 @then("I should be admin")

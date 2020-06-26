@@ -83,36 +83,7 @@ def create_user_open(
     return user
 
 
-@router.put("/me", response_model=User)
-def update_user_me(
-    *,
-    user_in: UserUpdate,
-    current_user: UserModel = Depends(get_current_active_user),
-):
-    """Update myself"""
-    user = UserModel.find(current_user.id)
-    user.update(user_in)
-    return user
-
-
-@router.get("/me", response_model=User)
-def read_user_me(
-    *,
-    current_user: UserModel = Depends(get_current_active_user),
-):
-    """Get current user."""
-    return current_user
-
-
-@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user_me(
-    *,
-    current_user: UserModel = Depends(get_current_active_user),
-):
-    current_user.delete()
-    return
-
-
+# TODO: only admin, simplify?
 @router.get("/{user_id}", response_model=User)
 def read_user_by_id(
     *,
