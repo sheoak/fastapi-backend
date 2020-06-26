@@ -4,7 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 import app.tests.data.samples as samples
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserUpdateFull
 
 
 pytestmark = pytest.mark.unitary
@@ -37,7 +37,7 @@ def test_update_password(
     base_user: Dict
 ) -> None:
     """It should be possible to use the update schema"""
-    user = UserUpdate(**base_user)
+    user = UserUpdateFull(**base_user)
     assert user.email == base_user["email"]
 
 

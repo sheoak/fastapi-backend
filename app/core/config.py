@@ -32,7 +32,8 @@ SMTP_USER = env.str("SMTP_USER")
 SMTP_PASSWORD = env.str("SMTP_PASSWORD")
 EMAILS_FROM_EMAIL = env.str("EMAILS_FROM_EMAIL", default="root@localhost")
 EMAILS_FROM_NAME = PROJECT_NAME
-EMAIL_RESET_TOKEN_EXPIRE_HOURS = 48
+EMAIL_RESET_TOKEN_EXPIRE_HOURS = env.int("EMAIL_RESET_TOKEN_EXPIRE_HOURS", default=24)
+EMAIL_CONFIRMATION_TOKEN_EXPIRE_HOURS = env.int("EMAIL_CONFIRMATION_TOKEN_EXPIRE_HOURS", default=24)
 EMAIL_TEMPLATES_DIR = "app/email-templates/build"
 EMAILS_ENABLED = SMTP_HOST and SMTP_PORT and EMAILS_FROM_EMAIL
 
@@ -56,3 +57,12 @@ PASSWORD_PWNED_CHECK = env.bool("PASSWORD_PWNED_CHECK", default=True)
 PASSWORD_ALLOW_SPECIAL = env.bool("PASSWORD_ALLOW_SPECIAL", default=True)
 
 RANDOM_WORD_FILE = 'data/dict/four-chars.fr.txt'
+
+# Sending email that point to the frontend
+FRONTEND_HOST = env.str('FRONTEND_HOST', default='http://localhost:8080')
+
+FRONTEND_ACTIVATE_URL = env.str('FRONTEND_ACTIVATE_URL', default='/activate/{token}')
+FRONTEND_MAGICLINK_URL = env.str('FRONTEND_MAGICLINK_URL', default='/login/{token}')
+FRONTEND_RESET_PASSWORD_URL = env.str('FRONTEND_RESET_PASSWORD_URL', default='/reset/{token}')
+FRONTEND_CONFIRM_EMAIL = env.str('FRONTEND_CONFIRM_EMAIL', default='/confirm/{token}')
+FRONTEND_LOGIN_URL = env.str('FRONTEND_LOGIN_URL', default='/login')
