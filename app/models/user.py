@@ -74,7 +74,7 @@ class User(BaseModel):
         """Try to authenticate the given user and return the user in case of
         success. Note that inactive users can be authenticate.
         Example:
-            User.authenticate("mymail@domain.com", "greatpassword")
+            User.authenticate("mymail@fastapi.test", "greatpassword")
         """
         # note that we get the user and don't make a direct search in the
         # database to avoid leaking informations in logs
@@ -110,9 +110,11 @@ class User(BaseModel):
         Example:
             user.update(password="thisisasecret")
         """
+
         data = self._import(user)
         return super().update(**data)
 
+    # TODO: handle errors
     def verify_password(self, password: str) -> bool:
         """Check that the password match the user password
         Example:
@@ -124,7 +126,6 @@ class User(BaseModel):
             return False
 
         # password expired
-        # TODO: handle errors
         if self.password_expire and self.password_expire < datetime.now():
             return False
 

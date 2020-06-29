@@ -10,7 +10,7 @@ from requests.models import Response
 from pytest_bdd import scenarios, given, when, then, parsers
 
 from app.models.user import User as UserModel
-from app.utils import generate_password_reset_token
+from app.utils import generate_password_reset_token, generate_email_confirmation_token
 
 
 # Loading the scenarios
@@ -58,9 +58,53 @@ def password_generated(
     user['password'] = UserModel.generate_password(user['email'])
     return user
 
+
+@given("I set myself as an admin", target_fixture="user")
+def set_as_admin(
+    user: Dict
+):
+    del user["password"]
+    user["is_superuser"] = True
+    return user
+
+
+@given("I have an email modification token", target_fixture='token')
+def get_email_modification_token(
+    user: Dict
+):
+    new_email = "newemail@fastapi.test"
+    return generate_email_confirmation_token(email=user["email"], new_email=new_email)
+
+
+# @given("My account gets disabled")
+# def account_gets_disabled(
+#     user: Dict
+# ):
+
+
 # -----------------------------------------------------------------------------
 # WHEN
 # -----------------------------------------------------------------------------
+
+@when("I request an email modification")
+def request_new_email(
+    post: Callable,
+    new_email: str,
+    context: Dict,
+):
+    context.data = new_email
+    context.response = post(f"/me/change-email/{new_email['email']}")
+
+
+@when("I confirm the email modification")
+def confirm_email(
+    user: Dict,
+    post: Callable,
+    context: Dict,
+    token: str,
+):
+    context.data = user
+    context.response = post(f"/validate-email/{token}")
 
 
 @when("I request a token")
@@ -159,7 +203,7 @@ def update_account(
 ) -> None:
     """Create an account and store the response"""
     context.data = user
-    context.response = put("/me/", json=user)
+    context.response = put("/me", json=user)
 
 
 @when(parsers.parse('I update the account'))

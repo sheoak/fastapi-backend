@@ -6,6 +6,7 @@ Feature: User endpoints
 Background:
     Given Some users are in the system
     And The server is set to not check corrupted passwords
+    And The server is set to not check special chars in passwords
     And I have a smtp server running
 
 
@@ -40,6 +41,8 @@ Scenario: Forbidden passwordless registration with a valid account
     And The server refuses passwordless registration
     When I create an account
     Then I should get a '422' response
+    And The response error type should be "value_error"
+    And The error list should contain "cannot be empty" in field "password"
     And The response should only contain the error
 
 Scenario: Forbidden access to account creation on the admin endpoint
@@ -142,27 +145,14 @@ Scenario: Open registration when it's disabled
 # TODO: check that the user cannot change their mail directly
 # TODO: check that the user need to confirm current password for change
 # ----------------------------------------------------------------------------
-# Scenario: Update my account
-#     Given I'm an active user
-#     And I have a valid token
-#     And I have a new email
-#     When I update my account
-#     Then I should get a '200' response
-#     And The following user fields should match: "email, full_name"
-#     And I should not be admin
-#     And I should be active
-#     And The response should not contain my password
+Scenario: Update my account with forbidden fields is_superuser
+    Given I'm an active user
+    And I have a valid token
+    And I set myself as an admin
+    When I update my account
+    Then I should get a '200' response
+    And I should not be admin
 
-# Scenario: Update my account with an invalid email
-#     Given I'm an active user
-#     And I have a valid token
-#     And I have an invalid email
-#     When I update my account
-#     Then I should get a '422' response
-#     And The response should only contain the error
-#     And The error list should contain "valid email" in field "email"
-
-# TODO: update an inactive user
 Scenario: Update an account
     Given I'm an admin
     And I have a valid token
@@ -171,6 +161,15 @@ Scenario: Update an account
     And The following user fields should match: "email, full_name"
     And It should not be admin
     And It should be active
+
+# TODO: handle account without passwords in sample data
+# Scenario: Update a password when it's not set
+#     Given I'm an active user
+#     And I have a valid token
+#     And I have a new password
+#     And I have the old password
+#     When I update my account
+#     Then I should get a '400' response
 
 Scenario: Update an inactive account
     Given I'm an admin
@@ -186,6 +185,20 @@ Scenario: Update an non existing account
     When I update the account
     Then I should get a '404' response
     And The response should only contain the error
+
+Scenario: Request an email update
+    Given I'm an active user
+    And I have a valid token
+    And I have a new email
+    When I request an email modification
+    Then I should get a '200' response
+    And I should receive an email
+
+Scenario: Confirm an email update
+    Given I'm an active user
+    And I have an email modification token
+    When I confirm the email modification
+    Then I should get a '200' response
 
 # ----------------------------------------------------------------------------
 # Retrieve an account

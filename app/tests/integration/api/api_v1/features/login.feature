@@ -7,6 +7,7 @@ Feature: Login
 Background:
     Given Some users are in the system
     And The server is set to not check corrupted passwords
+    And The server is set to not check special chars in passwords
     And I have a smtp server running
 
 

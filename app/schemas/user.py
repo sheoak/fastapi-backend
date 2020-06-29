@@ -1,3 +1,5 @@
+import re
+
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, validator
@@ -29,9 +31,9 @@ def validate_password(password: str):
     if len(password) < config.MIN_PASSWORD_LENGTH:
         raise ValueError("password is too short")
 
-    # TODO: move to options
-    # if not re.match(r"^(\s|\w|[-$#\"|\\+%=/<>@^_{}~*:;!?&'])+$", password):
-    #     raise ValueError("passwords contains forbidden characters")
+    if (config.PASSWORD_MATCH_REG and
+            not re.match(r"^(\s|\w|[-$#\"|\\+%=/<>@^_{}~*:;!?&'])+$", password)):
+        raise ValueError("passwords contains forbidden characters")
 
     if (not config.PASSWORD_PWNED_CHECK):
         return password
@@ -43,12 +45,16 @@ def validate_password(password: str):
 
 # Shared properties
 class UserBase(BaseModel):
-    is_active: Optional[bool] = True
-    is_superuser: Optional[bool] = False
     full_name: Optional[str] = None
 
 
-class UserBaseInDB(UserBase):
+# With admin properties
+class UserAdvanced(UserBase):
+    is_active: Optional[bool] = True
+    is_superuser: Optional[bool] = False
+
+
+class UserBaseInDB(UserAdvanced):
     id: Optional[int] = None
     email: Optional[EmailStr] = None
 
@@ -64,9 +70,13 @@ class UserCreate(UserBase):
     _normalize_password = validator('password', allow_reuse=True, always=True)(validate_password)
 
 
+# Properties to receive via API on creation
+class UserCreateFull(UserCreate, UserAdvanced):
+    pass
+
+
 # Properties to receive via API on update
 # Updating email is forbidden
-# TODO: manage errors if email is given
 class UserUpdate(UserBase):
     password: Optional[str] = None
 
@@ -74,7 +84,7 @@ class UserUpdate(UserBase):
 
 
 # Updating email is allowed
-class UserUpdateFull(UserUpdate):
+class UserUpdateFull(UserAdvanced, UserUpdate):
     email: Optional[EmailStr] = None
 
 
