@@ -307,6 +307,12 @@ def disable_pwned_password() -> None:
     yield from tweak_config('PASSWORD_PWNED_CHECK', False)
 
 
+@given("The server is set to not check special chars in passwords")
+def enable_password_special_chars() -> None:
+    """Disable special chars password verification"""
+    yield from tweak_config('PASSWORD_MATCH_REG', None)
+
+
 # ----------------------------------------------------------------------------
 # USERS (fixtures)
 # ----------------------------------------------------------------------------
@@ -355,16 +361,6 @@ def users_hashed(users: Dict) -> Dict:
 def user(normal_users: Dict[str, str]) -> Dict[str, str]:
     """A standard, non admin user"""
     return normal_users[0].copy()
-
-
-@given(parsers.parse('I\'m an active user "{fullname:l}"'), target_fixture="user")
-def active_user(
-    normal_users: Dict[str, str],
-    fullname: str,
-) -> Dict[str, str]:
-    """A standard, non admin user, named fullname"""
-    user = next(filter(lambda user: user['full_name'] == fullname, normal_users))
-    return user.copy()
 
 
 @given("I have a new user", target_fixture="user")

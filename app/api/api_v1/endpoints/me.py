@@ -1,7 +1,7 @@
 """
 Current user endpoint: /me/*
 """
-from fastapi import APIRouter, Depends, status, HTTPException, Body
+from fastapi import APIRouter, Depends, status, HTTPException
 # from sqlalchemy_mixins import ModelNotFoundError
 
 # from app.db.base_class import ModelExistError
@@ -11,7 +11,6 @@ from app.schemas.msg import Msg
 from app.schemas.user import User, UserUpdate, UserUpdateFull
 from app.utils import send_confirmation_email, generate_email_confirmation_token, verify_email_confirmation_token
 
-from pydantic import EmailStr
 
 router = APIRouter()
 
@@ -31,10 +30,34 @@ def read_user_me(
 def update_user_me(
     *,
     user_in: UserUpdate,
+    old_password: str = None,
     current_user: UserModel = Depends(get_current_active_user),
 ):
     """Update myself"""
     user = UserModel.find(current_user.id)
+
+    if user_in.password:
+
+        # updating a non-set password is forbidden
+        if not current_user.password_set:
+            raise HTTPException(
+                status_code=400,
+                detail="You must first define a password",
+            )
+
+        # updating a password requires to provide the old password
+        if not old_password:
+            raise HTTPException(
+                status_code=400,
+                detail="You must provide the old password",
+            )
+
+        if not user.authenticate(old_password):
+            raise HTTPException(
+                status_code=400,
+                detail="Old password is invalid",
+            )
+
     user.update(user_in)
     return user
 
@@ -51,12 +74,11 @@ def delete_user_me(
     return
 
 
-# TODO: test
 # TODO: ask for password or code
-@router.post("/me/change-email", response_model=Msg)
+@router.post("/me/change-email/{email}", response_model=Msg)
 def change_email(
     *,
-    email: EmailStr,
+    email: str,
     current_user: UserModel = Depends(get_current_active_user),
 ):
     """Send a confirmation link to the new email"""
@@ -67,18 +89,21 @@ def change_email(
 
 
 # TODO: test
-@router.get("/validate-email", response_model=Msg)
+@router.post("/validate-email/{token}", response_model=Msg)
 def validate_email(
-    token: str = Body(...),
+    *,
+    token: str
 ):
     """Confirm a new email from a token"""
     # decode the token
-    (old_email, new_email) = verify_email_confirmation_token(token)
+    decoded_token = verify_email_confirmation_token(token)
 
-    if not old_email:
+    if not decoded_token:
         raise HTTPException(status_code=400, detail="Invalid token")
 
-    user = UserModel.where(email=old_email)
+    (old_email, new_email) = decoded_token
+
+    user = UserModel.where(email=old_email).first()
 
     if user is None:
         raise HTTPException(

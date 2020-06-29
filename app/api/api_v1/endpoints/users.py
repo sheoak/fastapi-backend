@@ -13,7 +13,7 @@ from app.db.base_class import ModelExistError
 from app.api.utils.security import get_current_active_superuser
 from app.core import config
 from app.models.user import User as UserModel
-from app.schemas.user import User, UserCreate, UserUpdateFull
+from app.schemas.user import User, UserCreate, UserUpdateFull, UserCreateFull
 from app.utils import send_new_account_email
 
 
@@ -82,7 +82,7 @@ def read_users(
 @router.post("/", response_model=User)
 def create_user(
     *,
-    user_in: UserCreate,
+    user_in: UserCreateFull,
     current_user: UserModel = Depends(get_current_active_superuser),
 ):
     """Create new user."""
