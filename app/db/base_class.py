@@ -1,6 +1,7 @@
-from typing import Dict
+from typing import Dict, Any
 
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.ext.declarative import as_declarative, declared_attr
+
 from sqlalchemy_mixins import AllFeaturesMixin
 
 from app.db.session import SessionScope
@@ -10,26 +11,24 @@ class ModelExistError(ValueError):
     pass
 
 
-# TODO: add tests for serializer and move to BaseModel
-class CustomBase(object):
+@as_declarative()
+class Base(object):
+    id: Any
+    __name__: str
+
     # Generate __tablename__ automatically
     @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
-
-
-Base = declarative_base(cls=CustomBase)
+    def __tablename__(self):
+        return self.__name__.lower()
 
 
 class BaseModel(Base, AllFeaturesMixin):
     __abstract__ = True
 
-    # TODO: page > 1
     @classmethod
     def all_by_page(cls, page: int = 1, limit: int = 20, **kwargs) -> Dict:
         start = (page - 1) * limit
         end = start + limit
-        # pytest.set_trace()
         return cls.query.slice(start, end).all()
 
     @classmethod
