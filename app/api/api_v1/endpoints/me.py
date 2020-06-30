@@ -1,15 +1,15 @@
 """
 Current user endpoint: /me/*
 """
-from fastapi import APIRouter, Depends, status, HTTPException
-# from sqlalchemy_mixins import ModelNotFoundError
+from fastapi import APIRouter, Depends, HTTPException, status
 
-# from app.db.base_class import ModelExistError
 from app.api.utils.security import get_current_active_user
 from app.models.user import User as UserModel
 from app.schemas.msg import Msg
 from app.schemas.user import User, UserUpdate, UserUpdateFull
-from app.utils import send_confirmation_email, generate_email_confirmation_token, verify_email_confirmation_token
+from app.utils import (generate_email_confirmation_token,
+                       send_confirmation_email,
+                       verify_email_confirmation_token)
 
 
 router = APIRouter()

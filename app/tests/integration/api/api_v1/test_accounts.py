@@ -2,16 +2,15 @@
 Uses pytest-bdd
 See features/ for the Gerkan definitions
 """
+from typing import Callable, Dict
+
 import pytest  # noqa
-
-from typing import Dict, Callable
-
+from pytest_bdd import given, parsers, scenarios, then, when
 from requests.models import Response
-from pytest_bdd import scenarios, given, when, then, parsers
 
 from app.models.user import User as UserModel
-from app.utils import generate_password_reset_token, generate_email_confirmation_token
-
+from app.utils import (generate_email_confirmation_token,
+                       generate_password_reset_token)
 
 # Loading the scenarios
 # Note that scenarios can be override *before* this line to add more

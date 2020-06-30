@@ -7,14 +7,12 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from passlib.context import CryptContext
-from sqlalchemy import Boolean, Column, Integer, String, DateTime
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.sql import func
 
 from app.db.base_class import BaseModel, ModelExistError
-from app.schemas.user import UserCreate, UserUpdate, UserBaseInDB
-
+from app.schemas.user import UserBaseInDB, UserCreate, UserUpdate
 from app.utils import random_n_words
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -20,64 +20,25 @@ from datetime import timedelta
 from typing import Dict, Generator
 
 import pytest  # noqa
-# import smtpmock
 from fastapi.testclient import TestClient
 from pytest_bdd import given, parsers, then
-from sqlalchemy.orm.scoping import scoped_session
 from requests.models import Response
+from sqlalchemy.orm.scoping import scoped_session
 
 import app.tests.data.samples as samples
 from app.api.utils.security import create_token
 from app.core import config
 from app.core.jwt import create_access_token
 from app.db.base_class import Base
-from app.db.session import engine, SessionScope
+from app.db.session import SessionScope, engine
 from app.main import app
 from app.models.user import User, pwd_context
 from app.tests.utils.utils import tweak_config
-
-# import asyncore
-# import re
-# import smtpd
-# import threading
-
-# class MockSMTPServer(smtpd.SMTPServer, threading.Thread):
-#     '''
-#     A mock SMTP server. Runs in a separate thread so can be started from
-#     existing test code.
-#     '''
-
-#     def __init__(self, hostname, port):
-#         threading.Thread.__init__(self)
-#         smtpd.SMTPServer.__init__(self, (hostname, port), None)
-#         self.daemon = True
-#         self.received_messages = []
-#         self.start()
-
-#     def run(self):
-#         asyncore.loop()
-
-#     def process_message(self, peer, mailfrom, rcpttos, data):
-#         self.received_messages.append(data)
-
-#     def reset(self):
-#         self.received_messages = []
-
-#     # helper methods for assertions in test cases
-
-#     def received_message_matching(self, template):
-#         for message in self.received_messages:
-#             if re.match(template, message): return True
-#         return False
-
-#     def received_messages_count(self):
-#         return len(self.received_messages)
 
 
 @given("I have a smtp server running", scope="session")
 def smtp_server():
     pass
-    # return MockSMTPServer(config.SMTP_HOST, config.SMTP_PORT)
 
 
 @given("The test database is empty", scope="session")
