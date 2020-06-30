@@ -68,16 +68,14 @@ Scenario: Login as a user
     Then I should get a '200' response
     And The response should contain the following non-empty fields: "access_token, token_type"
 
-# TODO: verify the response does not contain the password
-# TODO: verify email is sent
 Scenario: Get a temporary password
     Given I'm an active user
     When I request a temporary password
     Then I should get a '200' response
     And I should receive an email
+    # And The email should contain the token
 
 # Verify we don't leak information about existing accounts
-# TODO: check no email is send?
 Scenario: Get a temporary password with an invalid email
     Given I'm a new user
     When I request a temporary password
