@@ -25,4 +25,3 @@ def init_db():
             is_superuser=True,
         )
         user = UserModel.create(user_in)
-        # SessionScope().commit()

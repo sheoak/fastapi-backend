@@ -263,10 +263,6 @@ Scenario: Listing users by page
 
 # ----------------------------------------------------------------------------
 # Password recovery
-#
-# TODO: mail mocking
-# TODO: password reset
-# TODO: mail is invalid?
 # ----------------------------------------------------------------------------
 Scenario: Password recovery
     Given: I'm an active user
@@ -274,7 +270,6 @@ Scenario: Password recovery
     Then I should get a '200' response
     And The response should contain the following non-empty fields: "msg"
     And I should receive an email
-    # TODO: check the email, using a mock?
 
 Scenario: Password reset
     Given I'm an active user
@@ -282,7 +277,6 @@ Scenario: Password reset
     When I visit the recovery link with my token
     Then I should get a '200' response
     And The response field "msg" should be "Password updated successfully"
-    And I should receive an email
 
 Scenario: Password reset with an invalid token
     Given I'm an active user

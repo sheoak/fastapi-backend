@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 from typing import Dict, Generator
 
+from emails.message import Message
 import pytest  # noqa
 from fastapi.testclient import TestClient
 from pytest_bdd import given, parsers, then
@@ -36,9 +37,17 @@ from app.models.user import User, pwd_context
 from app.tests.utils.utils import tweak_config
 
 
-@given("I have a smtp server running", scope="session")
+@given("I have a smtp server running", scope="function")
 def smtp_server():
-    pass
+    class Spy_send():
+        sent: int = 0
+
+        def send(self, **kwargs):
+            Spy_send.sent += 1
+            self.to = kwargs["to"]
+
+    Message.send = Spy_send.send
+    return Spy_send
 
 
 @given("The test database is empty", scope="session")
@@ -445,12 +454,11 @@ def check_response_status(
 def check_get_email(
     smtp_server
 ) -> None:
-    pass
-    # assert(smtp_server.received_message_matching("From: .*\\nTo: .*\\n+.+tent"))
+    assert smtp_server.sent == 1
 
 
 @then("I should not receive an email")
 def check_get_no_email(
     smtp_server
 ) -> None:
-    pass
+    assert smtp_server.sent == 0
