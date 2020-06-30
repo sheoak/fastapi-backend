@@ -17,10 +17,10 @@ import random
 import string
 from dataclasses import dataclass
 from datetime import timedelta
-from typing import Dict, Generator
+from typing import Dict, Generator, List
 
-from emails.message import Message
 import pytest  # noqa
+from emails.backend.smtp.backend import SMTPBackend
 from fastapi.testclient import TestClient
 from pytest_bdd import given, parsers, then
 from requests.models import Response
@@ -37,17 +37,37 @@ from app.models.user import User, pwd_context
 from app.tests.utils.utils import tweak_config
 
 
+# TODO: use context manager and mock.patch
 @given("I have a smtp server running", scope="function")
 def smtp_server():
-    class Spy_send():
-        sent: int = 0
+    class Spy_SMTP():
+        sent: List = []
 
-        def send(self, **kwargs):
-            Spy_send.sent += 1
-            self.to = kwargs["to"]
+        @staticmethod
+        def spy(self, **kwargs):
+            Spy_SMTP.sent.append({
+                "to": kwargs["to_addrs"],
+                "from": kwargs["to_addrs"],
+                "text": kwargs["msg"].html_body,
+            })
 
-    Message.send = Spy_send.send
-    return Spy_send
+        def assert_count(self, i: int):
+            assert len(self.sent) == i
+
+        def assert_last_from(self, email: str):
+            assert email in self.sent[-1]["to"]
+
+        def assert_last_to(self, email: str):
+            assert email in self.sent[-1]["to"]
+
+        def reset(self):
+            self.sent = []
+
+    spy_smtp = Spy_SMTP()
+    SMTPBackend.sendmail = Spy_SMTP.spy
+
+    yield spy_smtp
+    spy_smtp.reset()
 
 
 @given("The test database is empty", scope="session")
@@ -451,14 +471,34 @@ def check_response_status(
 
 
 @then("I should receive an email")
+@then("The user should receive an email")
 def check_get_email(
-    smtp_server
+    smtp_server,
+    user: Dict,
 ) -> None:
-    assert smtp_server.sent == 1
+    smtp_server.assert_count(1)
+    smtp_server.assert_last_to(user["email"])
 
 
+@then("The user should not receive an email")
 @then("I should not receive an email")
 def check_get_no_email(
     smtp_server
 ) -> None:
-    assert smtp_server.sent == 0
+    smtp_server.assert_count(0)
+
+
+@then("The email should not contain my password")
+def check_email_does_not_contain_password(
+    smtp_server,
+    user: Dict,
+):
+    assert user["password"] not in smtp_server.sent[-1]["text"]
+
+
+# @then("The email should contain the token")
+# def check_email_does_contain_token(
+#     smtp_server,
+#     token: str,
+# ):
+#     assert token in smtp_server.sent[-1]["text"]

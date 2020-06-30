@@ -22,6 +22,7 @@ Scenario: Open registration with a valid account
     And I should not be admin
     And The response should not contain my password
     And I should receive an email
+    And The email should not contain my password
 
 Scenario: Open passwordless registration with a valid account
     Given I'm a new user
@@ -44,6 +45,7 @@ Scenario: Forbidden passwordless registration with a valid account
     And The response error type should be "value_error"
     And The error list should contain "cannot be empty" in field "password"
     And The response should only contain the error
+    And I should not receive an email
 
 Scenario: Forbidden access to account creation on the admin endpoint
     Given I'm an active user
@@ -53,6 +55,7 @@ Scenario: Forbidden access to account creation on the admin endpoint
     Then I should get a '403' response
     And The response error should contain "The user doesn't have enough privileges"
     And The response should only contain the error
+    And I should not receive an email
 
 Scenario: Authorized access to account creation on the admin endpoint
     Given I'm an admin
@@ -61,6 +64,7 @@ Scenario: Authorized access to account creation on the admin endpoint
     When I create an account on the admin endpoint
     Then I should get a '200' response
     And The following user fields should match: "email"
+    And The user should receive an email
 
 Scenario: Register with an invalid email
     Given I have an invalid email
@@ -71,6 +75,7 @@ Scenario: Register with an invalid email
     And The error list should contain "valid email" in field "email"
     And The response should only contain the error
     And The response should not contain my password
+    And The user should not receive an email
 
 Scenario: Register with an invalid password
     Given I have an invalid password
@@ -81,6 +86,7 @@ Scenario: Register with an invalid password
     And The error list should contain "too short" in field "password"
     And The response should only contain the error
     And The response should not contain my password
+    And The user should not receive an email
 
 @local
 Scenario: Register with a corrupted password
@@ -92,6 +98,7 @@ Scenario: Register with a corrupted password
     And The error list should contain "compromised" in field "password"
     And The response should only contain the error
     And The response should not contain my password
+    And The user should not receive an email
 
 @local
 Scenario: Register with a non-corrupted password
@@ -101,7 +108,6 @@ Scenario: Register with a non-corrupted password
     When I create an account
     Then I should get a '200' response
 
-# TODO: 400 error?
 Scenario: Open registration with a unavailable email
     Given I have an unavailable email
     And The server accepts open registration
@@ -110,6 +116,7 @@ Scenario: Open registration with a unavailable email
     And The response error should contain "The user with this username already exists in the system"
     And The response should only contain the error
     And The response should not contain my password
+    And I should not receive an email
 
 Scenario: Open registration with a missing email
     Given I have no email
@@ -129,6 +136,7 @@ Scenario: Close registration with a unavailable email
     And The response error should contain "The user with this username already exists in the system"
     And The response should only contain the error
     And The response should not contain my password
+    And I should not receive an email
 
 Scenario: Open registration when it's disabled
     Given I'm a new user
@@ -138,10 +146,10 @@ Scenario: Open registration when it's disabled
     And The response error should contain "registration is forbidden"
     And The response should only contain the error
     And The response should not contain my password
+    And I should not receive an email
 
 # ----------------------------------------------------------------------------
 # Update an account
-# TODO: check that the user can not set theirselves as admin
 # TODO: check that the user cannot change their mail directly
 # TODO: check that the user need to confirm current password for change
 # ----------------------------------------------------------------------------
@@ -243,7 +251,6 @@ Scenario: Accessing profiles without privileges
 #
 # TODO: pagination
 # ----------------------------------------------------------------------------
-
 # TODO: add more user and test default pagination
 Scenario: Listing users
     Given I'm an admin
