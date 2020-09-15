@@ -119,7 +119,7 @@ traitlets==4.3.3
 transaction==3.0.0
 uritemplate==3.0.1
 urllib3==1.25.9
-uvicorn==0.11.5
+uvicorn==0.11.7
 uvloop==0.14.0
 vine==1.3.0
 watchdog==0.10.2
