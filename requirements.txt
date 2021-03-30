@@ -79,7 +79,7 @@ pycodestyle==2.6.0
 pycparser==2.20
 pydantic==1.5.1
 pyflakes==2.2.0
-Pygments==2.6.1
+Pygments==2.7.4
 PyJWT==1.7.1
 pylint==2.5.2
 pyparsing==2.4.7
