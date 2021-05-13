@@ -77,7 +77,7 @@ pwnedpass==0.0.2
 py==1.8.1
 pycodestyle==2.6.0
 pycparser==2.20
-pydantic==1.5.1
+pydantic==1.6.2
 pyflakes==2.2.0
 Pygments==2.6.1
 PyJWT==1.7.1
