@@ -46,7 +46,7 @@ isort==4.3.21
 jedi==0.17.0
 Jinja2==2.11.2
 johnnydep==1.5
-jwcrypto==0.7
+jwcrypto==1.4
 kombu==4.6.8
 lazy-object-proxy==1.4.3
 lxml==4.5.1
